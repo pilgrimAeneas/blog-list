@@ -13,7 +13,7 @@ const unknownEndpoint = (req, res) => {
 }
 
 const errorHandler = (error, req, res, next) => {
-  console.log(error.message)
+  info(error.message)
 
   // if (error.name === "") {
   //   return res.status(0).send({})

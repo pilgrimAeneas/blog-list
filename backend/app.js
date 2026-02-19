@@ -1,16 +1,16 @@
 const { MONGODB_URL } = require("./utils/config")
 const express = require("express")
 const mongoose = require("mongoose")
-const app = express()
 const blogsRouter = require("./controllers/blogs")
 const { requestLogger, unknownEndpoint, errorHandler } = require("./utils/middleware")
 const { info, error } = require("./utils/logger")
 
+const app = express()
 mongoose.connect(MONGODB_URL, { family: 4 })
   .then(() => info("connected to DB successfully"))
   .catch(result => error(result.message))
 
-// app.use(express.static("dist"))
+// app.use(express.static("dist")) // waiting for front end build
 app.use(express.json())
 app.use(requestLogger)
 
