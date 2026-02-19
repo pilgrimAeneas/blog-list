@@ -9,24 +9,19 @@ const favoriteBlog = blogs => {
 }
 
 // maybe make these two better?
-// First one can improve by using an optimized library or a dictionary
-// instead of the authorsRepeated forEach to avoid double loops O(n^2)
-// Second one can use a variable name after each higher-order function call
+// can improve readability with intermediate variables to
+// hold the mapping/reduce returns.
 
 const mostBlogs = blogs => {
-  const authorsRepeated = blogs.reduce((acc, blog) => acc.concat(blog.author), [])
-  const authorsUnique = [...(new Set(authorsRepeated))]
-  const authorScores = authorsUnique.map(author => {
-    return { name: author, score: 0 }
-  })
-
-  authorsRepeated.forEach(author => {
-    authorScores.find((entry) => entry.name === author).score++
-  })
-
-  return authorScores.reduce((acc, author) => {
-    return author.score > acc.score ? author : acc
-  })
+  return Object.entries(lodash.groupBy(blogs, "author"))
+    .map(author_blogs => { return { name: author_blogs[0], blogs: author_blogs[1] } })
+    .map(author_blogs => {
+      return {
+        name: author_blogs.name,
+        score: author_blogs.blogs.length
+      }
+    })
+    .reduce((acc, author) => author.score > acc.score ? author : acc)
 }
 
 const mostLikes = blogs => {
