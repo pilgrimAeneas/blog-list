@@ -1,6 +1,11 @@
 const { test, describe } = require("node:test")
 const assert = require("node:assert")
-const { totalLikes, favoriteBlog, mostBlogs } = require("../utils/list_helper")
+const {
+  totalLikes,
+  favoriteBlog,
+  mostBlogs,
+  mostLikes
+} = require("../utils/list_helper")
 
 const listWithOneBlog = [
   {
@@ -130,6 +135,22 @@ const more_blogs = [
     __v: 0
   },
 ]
+
+describe("mostLikes", () => {
+  test("One blog only", () => {
+    assert.deepStrictEqual(
+      mostLikes(listWithOneBlog),
+      { name: "Edsger W. Dijkstra", likes: 5 }
+    )
+  })
+
+  test("list with way too many blogs", () => {
+    assert.deepStrictEqual(
+      mostLikes(more_blogs),
+      { name: "Edsger W. Dijkstra", likes: 22 }
+    )
+  })
+})
 
 describe("mostBlogs", () => {
   test("One blog only", () => {

@@ -1,3 +1,5 @@
+const lodash = require("lodash")
+
 const totalLikes = blogs => {
   return blogs.reduce((acc, blog) => blog.likes + acc, 0)
 }
@@ -5,6 +7,8 @@ const totalLikes = blogs => {
 const favoriteBlog = blogs => {
   return blogs.reduce((acc, blog) => blog.likes > acc.likes ? blog : acc)
 }
+
+// maybe make these two better?
 
 const mostBlogs = blogs => {
   const authorsRepeated = blogs.reduce((acc, blog) => acc.concat(blog.author), [])
@@ -22,10 +26,21 @@ const mostBlogs = blogs => {
   })
 }
 
-
+const mostLikes = blogs => {
+  return Object.entries(lodash.groupBy(blogs, "author"))
+    .map(author_blogs => { return { name: author_blogs[0], blogs: author_blogs[1] } })
+    .map(author_blogs => {
+      return {
+        name: author_blogs.name,
+        likes: author_blogs.blogs.reduce((acc, blog) => acc + blog.likes, 0)
+      }
+    })
+    .reduce((acc, author) => author.likes > acc.likes ? author : acc)
+}
 
 module.exports = {
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 }
