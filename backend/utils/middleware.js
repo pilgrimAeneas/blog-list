@@ -12,4 +12,16 @@ const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: "unknown endpoint" })
 }
 
-module.exports = { requestLogger, unknownEndpoint }
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message)
+
+  // if (error.name === "") {
+  //   return res.status(0).send({})
+  // } else if (error.name === "") {
+  //   return res.status(0).send({})
+  // }
+
+  next(error)
+}
+
+module.exports = { requestLogger, unknownEndpoint, errorHandler }
