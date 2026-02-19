@@ -9,6 +9,9 @@ const favoriteBlog = blogs => {
 }
 
 // maybe make these two better?
+// First one can improve by using an optimized library or a dictionary
+// instead of the authorsRepeated forEach to avoid double loops O(n^2)
+// Second one can use a variable name after each higher-order function call
 
 const mostBlogs = blogs => {
   const authorsRepeated = blogs.reduce((acc, blog) => acc.concat(blog.author), [])
