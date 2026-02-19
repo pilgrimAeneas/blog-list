@@ -1,9 +1,10 @@
+const { MONGODB_URL } = require("./utils/config")
 const express = require("express")
 const mongoose = require("mongoose")
 const Blog = require("./models/blog")
 const app = express()
 
-mongoose.connect(process.env.MONGODB_URL, { family: 4 })
+mongoose.connect(MONGODB_URL, { family: 4 })
 
 app.use(express.json())
 
