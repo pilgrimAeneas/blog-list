@@ -15,7 +15,6 @@ beforeEach(async () => {
     .map(blog => blog.save()))
 })
 
-// Tests here
 test("Return correct number of blogs in json format", async () => {
   const response = await api
     .get("/api/blogs")
@@ -30,6 +29,29 @@ test("Blog's unique identifier is name id not _id", async () => {
   const one_blog = response.body[0]
   assert(Object.keys(one_blog).includes("id"))
   assert(!Object.keys(one_blog).includes("_id"))
+})
+
+test("POST successfully adds a blog to DB", async () => {
+  const testingBlog = {
+    title: "Testing blog",
+    author: "Testing author",
+    url: "test.com",
+    likes: 0,
+  }
+
+  const blogsBefore = await blogsInDB()
+  await api
+    .post("/api/blogs")
+    .send(testingBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/)
+  const blogsAfter = await blogsInDB()
+
+  assert(blogsAfter.length === blogsBefore.length + 1)
+  assert(blogsAfter.map(blog => blog.title).includes(testingBlog.title))
+  assert(blogsAfter.map(blog => blog.author).includes(testingBlog.author))
+  assert(blogsAfter.map(blog => blog.url).includes(testingBlog.url))
+  assert(blogsAfter.map(blog => blog.likes).includes(testingBlog.likes))
 })
 
 after(async () => {
