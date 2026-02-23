@@ -36,7 +36,7 @@ test("POST successfully adds a blog to DB", async () => {
     title: "Testing blog",
     author: "Testing author",
     url: "test.com",
-    likes: 0,
+    likes: 5,
   }
 
   const blogsBefore = await blogsInDB()
@@ -52,6 +52,27 @@ test("POST successfully adds a blog to DB", async () => {
   assert(blogsAfter.map(blog => blog.author).includes(testingBlog.author))
   assert(blogsAfter.map(blog => blog.url).includes(testingBlog.url))
   assert(blogsAfter.map(blog => blog.likes).includes(testingBlog.likes))
+})
+
+test("POST blog with no likes defaults to 0", async () => {
+  const noLikesBlog = {
+    title: "No likes blog",
+    author: "No likes author",
+    url: "Nolikes.com",
+  }
+
+  const response = await api
+    .post("/api/blogs")
+    .send(noLikesBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/)
+
+  const newBlogAsResponse = response.body
+  const newBlogInDB = (await blogsInDB())
+    .find(blog => blog.title === noLikesBlog.title)
+
+  assert(newBlogAsResponse.likes === 0)
+  assert(newBlogInDB.likes === 0)
 })
 
 after(async () => {
