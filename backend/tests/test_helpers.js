@@ -52,9 +52,9 @@ const initialBlogs = [
 ]
 
 const blogsInDB = async () => (await Blog.find({})).map(blog => blog.toJSON())
-const generateID = () => {
+const getValidUnusedID = () => {
   const newBlog = new Blog({ title: "none", author: "none", url: "none", likes: 0 })
   return newBlog._id.toString()
 }
 
-module.exports = { initialBlogs, blogsInDB, generateID }
+module.exports = { initialBlogs, blogsInDB, getValidUnusedID }

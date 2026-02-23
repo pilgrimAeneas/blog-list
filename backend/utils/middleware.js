@@ -15,11 +15,9 @@ const unknownEndpoint = (req, res) => {
 const errorHandler = (error, req, res, next) => {
   info(error.message)
 
-  // if (error.name === "") {
-  //   return res.status(0).send({})
-  // } else if (error.name === "") {
-  //   return res.status(0).send({})
-  // }
+  if (error.name === "ValidationError") {
+    return res.status(400).send({ error: "Title or URL missing" })
+  }
 
   next(error)
 }

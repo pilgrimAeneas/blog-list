@@ -1,10 +1,10 @@
-const { describe, test, after, beforeEach } = require("node:test")
+const { test, after, beforeEach } = require("node:test")
 const assert = require("node:assert")
 const app = require("../app")
 const supertest = require("supertest")
 const mongoose = require("mongoose")
 const Blog = require("../models/blog")
-const { initialBlogs, blogsInDB, generateID } = require("./test_helpers")
+const { initialBlogs, blogsInDB } = require("./test_helpers")
 
 const api = supertest(app)
 
@@ -73,6 +73,18 @@ test("POST blog with no likes defaults to 0", async () => {
 
   assert(newBlogAsResponse.likes === 0)
   assert(newBlogInDB.likes === 0)
+})
+
+test("Missing url or title sends a status 400", async () => {
+  const pizzaWithNothing = {
+    author: "No one",
+    likes: 5
+  }
+
+  await api
+    .post("/api/blogs")
+    .send(pizzaWithNothing)
+    .expect(400)
 })
 
 after(async () => {
