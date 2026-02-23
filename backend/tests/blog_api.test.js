@@ -15,7 +15,7 @@ beforeEach(async () => {
     .map(blog => blog.save()))
 })
 
-describe("GET/Read part of the API", () => {
+describe("GET/Read Functionality", () => {
   describe("GET/Read all notes", () => {
     test("Return correct number of blogs in json format", async () => {
       const response = await api
@@ -35,7 +35,7 @@ describe("GET/Read part of the API", () => {
   })
 })
 
-describe("POST/Create part of the API", () => {
+describe("POST/Create Functionality", () => {
   test("POST successfully adds a blog to DB", async () => {
     const testingBlog = {
       title: "Testing blog",
@@ -93,7 +93,35 @@ describe("POST/Create part of the API", () => {
   })
 })
 
-describe("DELETE/Delete part of the API", () => {
+describe("PUT/Update Functionality", () => {
+  test("Update a note's likes field", async () => {
+    const blogsBefore = await blogsInDB()
+
+    const firstBlog = blogsBefore[0]
+    const firstBlogID = firstBlog.id
+
+    const newBlog = {
+      title: firstBlog.title,
+      author: firstBlog.author,
+      url: firstBlog.url,
+      likes: 100,
+      id: firstBlog.id,
+    }
+
+    await api
+      .put(`/api/blogs/${firstBlogID}`)
+      .send(newBlog)
+      .expect(200)
+
+    const blogsAfter = await blogsInDB()
+
+    assert(blogsAfter.length === blogsBefore.length)
+    assert(blogsAfter.map(blog => blog.id).includes(firstBlogID))
+    assert(blogsAfter.find(blog => blog.id === firstBlogID).likes === 100)
+  })
+})
+
+describe("DELETE/Delete Functionality", () => {
   test("DELETE blog works correctly", async () => {
     const blogsBefore = await blogsInDB()
     const firstBlog = blogsBefore[0]
