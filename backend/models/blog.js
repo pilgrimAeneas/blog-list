@@ -11,11 +11,17 @@ const blogSchema = mongoose.Schema({
     required: true
   },
   likes: Number,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 })
 
 blogSchema.set("toJSON", {
   transform: (document, object) => {
     object.id = object._id.toString()
+    object.user = object.user.toString()
     delete object._id
     delete object.__v
   }

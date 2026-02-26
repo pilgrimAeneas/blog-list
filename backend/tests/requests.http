@@ -1,13 +1,25 @@
-POST http://localhost:3003/api/blogs
+POST http://localhost:3003/api/users
 content-type: application/json
 
 {
-  "title": "Sixth Title",
-  "author": "Sixth Author",
-  "url": "www.url.etc",
-  "likes": 0
+  "name": "Hello, world!",
+  "username": "root",
+  "password": "hash!me!now"
 }
 
 ###
 
-GET http://localhost:3003/api/blogs
+POST http://localhost:3003/api/blogs
+content-type: application/json
+
+{
+  "title": "1Hello, world!",
+  "author": "root",
+  "url": "hlow.com",
+  "user": "69a0db33472c5f8aa32062e1"
+}
+
+
+###
+
+DELETE http://localhost:3003/api/blogs/69a0dab3f5737725c41466bc

@@ -19,6 +19,12 @@ const errorHandler = (error, req, res, next) => {
     return res.status(400).send({ error: "Title or URL missing" })
   }
 
+  if (error.name === "MongoServerError" &&
+    error.message.includes("E11000")
+  ) {
+    return res.status(400).send({ error: "username not unique" })
+  }
+
   next(error)
 }
 

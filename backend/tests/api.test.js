@@ -1,47 +1,100 @@
 const { test, after, beforeEach, describe } = require("node:test")
 const assert = require("node:assert")
+const bcrypt = require("bcrypt")
 const app = require("../app")
 const supertest = require("supertest")
 const mongoose = require("mongoose")
 const Blog = require("../models/blog")
-const { initialBlogs, blogsInDB } = require("./test_helpers")
+const User = require("../models/user")
+const { initialBlogs, blogsInDB, usersInDB } = require("./test_helpers")
 
 const api = supertest(app)
 
 beforeEach(async () => {
+  await User.deleteMany({})
   await Blog.deleteMany({})
-  await Promise.all(initialBlogs
-    .map(blog => new Blog(blog))
-    .map(blog => blog.save()))
+
+  const saltRounds = 10
+  const passwordHash = await bcrypt.hash("fullstackpassword", saltRounds)
+  const root = new User({ name: "root", username: "root", passwordHash, })
+
+  const modelInitialBlogs = initialBlogs
+    .map(blog => new Blog({ ...blog, user: root._id.toString() }))
+
+  modelInitialBlogs.forEach(blog => root.blogs = root.blogs.concat(blog._id))
+
+  await Promise.all(modelInitialBlogs.map(blog => blog.save()))
+  await root.save()
 })
 
 describe("GET/Read Functionality", () => {
-  describe("GET/Read all notes", () => {
-    test("Return correct number of blogs in json format", async () => {
-      const response = await api
-        .get("/api/blogs")
-        .expect(200)
-        .expect("Content-Type", /application\/json/)
+  test("Return correct number of blogs in json format", async () => {
+    const response = await api
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/)
 
-      assert(response.body.length === initialBlogs.length)
-    })
+    assert(response.body.length === initialBlogs.length)
+  })
 
-    test("Returned blog's unique identifier is id not _id", async () => {
-      const response = await api.get("/api/blogs")
-      const one_blog = response.body[0]
-      assert(Object.keys(one_blog).includes("id"))
-      assert(!Object.keys(one_blog).includes("_id"))
-    })
+  test("Returned blog's unique identifier is id not _id", async () => {
+    const response = await api.get("/api/blogs")
+    const one_blog = response.body[0]
+    assert(Object.keys(one_blog).includes("id"))
+    assert(!Object.keys(one_blog).includes("_id"))
   })
 })
 
 describe("POST/Create Functionality", () => {
+  test("POST successfully creates a new user", async () => {
+    const usersBefore = await usersInDB()
+
+    const newUser = {
+      name: "Hello, world!",
+      username: "new_user",
+      password: "hash!me!now",
+    }
+
+    await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(201)
+      .expect("Content-Type", /application\/json/)
+
+    const usersAfter = await usersInDB()
+    assert(usersAfter.map(user => user.username).includes("new_user"))
+    assert(usersAfter.length - 1 === usersBefore.length)
+  })
+
+  test("POST doesn't create a new user without a unique username", async () => {
+    const usersBefore = await usersInDB()
+
+    const newUser = {
+      name: "Hello, world!",
+      username: "root",
+      password: "hash!me!now",
+    }
+
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/)
+
+    const usersAfter = await usersInDB()
+    assert(usersAfter.length === usersBefore.length)
+    assert(result.body.error === "username not unique")
+  })
+
   test("POST successfully adds a blog to DB", async () => {
+    const usersBefore = await usersInDB()
+
     const testingBlog = {
       title: "Testing blog",
       author: "Testing author",
       url: "test.com",
       likes: 5,
+      user: usersBefore[0].id,
     }
 
     const blogsBefore = await blogsInDB()
@@ -60,10 +113,13 @@ describe("POST/Create Functionality", () => {
   })
 
   test("POST blog with no likes defaults to 0", async () => {
+    const usersBefore = await usersInDB()
+
     const noLikesBlog = {
       title: "No likes blog",
       author: "No likes author",
       url: "Nolikes.com",
+      user: usersBefore[0].id,
     }
 
     const response = await api
@@ -100,12 +156,14 @@ describe("PUT/Update Functionality", () => {
     const firstBlog = blogsBefore[0]
     const firstBlogID = firstBlog.id
 
+
     const newBlog = {
+      id: firstBlog.id,
       title: firstBlog.title,
       author: firstBlog.author,
       url: firstBlog.url,
       likes: 100,
-      id: firstBlog.id,
+      user: firstBlog.user,
     }
 
     await api
