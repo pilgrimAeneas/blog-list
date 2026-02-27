@@ -23,3 +23,57 @@ content-type: application/json
 ###
 
 DELETE http://localhost:3003/api/blogs/69a0dab3f5737725c41466bc
+
+###
+
+POST http://localhost:3003/api/login
+content-type: application/json
+
+{
+  "username": "root",
+  "password": "hash!me!now"
+}
+
+###
+
+POST http://localhost:3003/api/login
+content-type: application/json
+
+{
+  "username": "root",
+  "password": "hash!e!now"
+}
+
+###
+
+POST http://localhost:3003/api/login
+content-type: application/json
+
+{
+  "username": "rooot",
+  "password": "hash!me!now"
+}
+
+###
+
+POST http://localhost:3003/api/blogs
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY5YTBkYjMzNDcyYzVmOGFhMzIwNjJlMSIsImlhdCI6MTc3MjE5NjM1MH0.uFQ-N9W-Rzi0Bh8lwfWgUriGqea4oTECyRWp55Lzl5A
+
+{
+  "title": "1Hello, world!",
+  "author": "root",
+  "url": "hlow.com"
+}
+
+###
+
+POST http://localhost:3003/api/blogs
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIszI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY5YTBkYjMzNDcyYzVmOGFhMzIwNjJlMSIsImlhdCI6MTc3MjE5NjM1MH0.uFQ-N9W-Rzi0Bh8lwfWgUriGqea4oTECyRWp55Lzl5A
+
+{
+  "title": "1Hello, world!",
+  "author": "root",
+  "url": "hlow.com"
+}
