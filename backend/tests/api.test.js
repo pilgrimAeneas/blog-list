@@ -194,6 +194,8 @@ describe("POST/Create Functionality", () => {
     assert(blogsAfter.map(blog => blog.author).includes(testingBlog.author))
     assert(blogsAfter.map(blog => blog.url).includes(testingBlog.url))
     assert(blogsAfter.map(blog => blog.likes).includes(testingBlog.likes))
+
+    // TODO: Test that the user has the new blog in his list of blogs
   })
 
   test("blog with no likes defaults to 0", async () => {
