@@ -7,6 +7,8 @@ const mongoose = require("mongoose")
 const Blog = require("../models/blog")
 const User = require("../models/user")
 const { initialBlogs, blogsInDB, usersInDB } = require("./test_helpers")
+const jwt = require("jsonwebtoken")
+const { SECRET } = require("../utils/config")
 
 const api = supertest(app)
 
@@ -46,11 +48,11 @@ describe("GET/Read Functionality", () => {
 })
 
 describe("POST/Create Functionality", () => {
-  test("POST successfully creates a new user", async () => {
+  test("successfully creates a new user", async () => {
     const usersBefore = await usersInDB()
 
     const newUser = {
-      name: "Hello, world!",
+      name: "first",
       username: "new_user",
       password: "hash!me!now",
     }
@@ -66,7 +68,85 @@ describe("POST/Create Functionality", () => {
     assert(usersAfter.length - 1 === usersBefore.length)
   })
 
-  test("POST doesn't create a new user without a unique username", async () => {
+  test("require password to be longer than 3", async () => {
+    const usersBefore = await usersInDB()
+
+    const newUser = {
+      name: "second",
+      username: "new_user2",
+      password: "h!",
+    }
+
+    await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/)
+
+    const usersAfter = await usersInDB()
+    assert(!usersAfter.map(user => user.username).includes("new_user2"))
+    assert(usersAfter.length === usersBefore.length)
+  })
+
+  test("require username to be longer than 3", async () => {
+    const usersBefore = await usersInDB()
+
+    const newUser = {
+      name: "third",
+      username: "n3",
+      password: "hashme!",
+    }
+
+    await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/)
+
+    const usersAfter = await usersInDB()
+    assert(!usersAfter.map(user => user.username).includes("new_user3"))
+    assert(usersAfter.length === usersBefore.length)
+  })
+
+  test("require a password with each created user", async () => {
+    const usersBefore = await usersInDB()
+
+    const newUser = {
+      name: "fourth",
+      username: "new_user4",
+    }
+
+    await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/)
+
+    const usersAfter = await usersInDB()
+    assert(!usersAfter.map(user => user.username).includes("new_user4"))
+    assert(usersAfter.length === usersBefore.length)
+  })
+
+  test("require a username with each created user", async () => {
+    const usersBefore = await usersInDB()
+
+    const newUser = {
+      name: "fifth",
+      password: "hasme!"
+    }
+
+    await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/)
+
+    const usersAfter = await usersInDB()
+    assert(!usersAfter.map(user => user.name).includes("fifth"))
+    assert(usersAfter.length === usersBefore.length)
+  })
+
+  test("don't create a new user with existing username", async () => {
     const usersBefore = await usersInDB()
 
     const newUser = {
@@ -86,20 +166,24 @@ describe("POST/Create Functionality", () => {
     assert(result.body.error === "username not unique")
   })
 
-  test("POST successfully adds a blog to DB", async () => {
+  test("successfully adds a blog to DB", async () => {
     const usersBefore = await usersInDB()
+    const fullAuth = jwt.sign({
+      username: usersBefore[0].username,
+      id: usersBefore[0].id
+    }, SECRET)
 
     const testingBlog = {
       title: "Testing blog",
       author: "Testing author",
       url: "test.com",
       likes: 5,
-      user: usersBefore[0].id,
     }
 
     const blogsBefore = await blogsInDB()
     await api
       .post("/api/blogs")
+      .set({ "Authorization": `Bearer ${fullAuth}` })
       .send(testingBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/)
@@ -112,18 +196,22 @@ describe("POST/Create Functionality", () => {
     assert(blogsAfter.map(blog => blog.likes).includes(testingBlog.likes))
   })
 
-  test("POST blog with no likes defaults to 0", async () => {
+  test("blog with no likes defaults to 0", async () => {
     const usersBefore = await usersInDB()
+    const fullAuth = jwt.sign({
+      username: usersBefore[0].username,
+      id: usersBefore[0].id
+    }, SECRET)
 
     const noLikesBlog = {
       title: "No likes blog",
       author: "No likes author",
       url: "Nolikes.com",
-      user: usersBefore[0].id,
     }
 
     const response = await api
       .post("/api/blogs")
+      .set({ "Authorization": `Bearer ${fullAuth}` })
       .send(noLikesBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/)
@@ -136,7 +224,13 @@ describe("POST/Create Functionality", () => {
     assert(newBlogInDB.likes === 0)
   })
 
-  test("POST blog with missing url or title sends a status 400", async () => {
+  test("blog with missing url or title sends a status 400", async () => {
+    const usersBefore = await usersInDB()
+    const fullAuth = jwt.sign({
+      username: usersBefore[0].username,
+      id: usersBefore[0].id
+    }, SECRET)
+
     const pizzaWithNothing = {
       author: "No one",
       likes: 5
@@ -144,6 +238,7 @@ describe("POST/Create Functionality", () => {
 
     await api
       .post("/api/blogs")
+      .set({ "Authorization": `Bearer ${fullAuth}` })
       .send(pizzaWithNothing)
       .expect(400)
   })
@@ -180,7 +275,7 @@ describe("PUT/Update Functionality", () => {
 })
 
 describe("DELETE/Delete Functionality", () => {
-  test("DELETE blog works correctly", async () => {
+  test("Deleting a blog works correctly", async () => {
     const blogsBefore = await blogsInDB()
     const firstBlog = blogsBefore[0]
     const existingBlogID = firstBlog.id

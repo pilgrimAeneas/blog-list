@@ -47,7 +47,7 @@ blogsRouter.post("/", async (request, response) => {
 })
 
 blogsRouter.delete("/:id", async (request, response) => {
-  // only signed in will delete only in own notes list
+  // TODO: only signed in will delete only in own notes list
   const blogId = request.params.id
   const user = (await User.findById((await Blog.findById(blogId)).user.toString()))
 
@@ -59,7 +59,7 @@ blogsRouter.delete("/:id", async (request, response) => {
 })
 
 blogsRouter.put("/:id", async (request, response) => {
-  // only signed in will update only in own notes list
+  // TODO: only signed in will update only in own notes list
   const { title, author, url, likes, user } = request.body
 
   const theBlog = await Blog.findById(request.params.id)

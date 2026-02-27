@@ -15,7 +15,14 @@ const unknownEndpoint = (req, res) => {
 const errorHandler = (error, req, res, next) => {
   info(error.message)
 
-  if (error.name === "ValidationError") {
+  if (error.name === "ValidationError" &&
+    error.message.includes("username")) {
+    return res.status(400).send({ error: "Invalid username" })
+  }
+
+  if (error.name === "ValidationError" &&
+    (error.message.includes("title") || error.message.includes("url"))
+  ) {
     return res.status(400).send({ error: "Title or URL missing" })
   }
 
@@ -27,6 +34,10 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === "JsonWebTokenError") {
     return res.status(401).send({ error: "invalid token" })
+  }
+
+  if (error.name === "TokenExpiredError") {
+    return res.status(401).json({ error: "Expired token" })
   }
 
   next(error)

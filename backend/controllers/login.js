@@ -11,9 +11,6 @@ loginRouter.post("/", async (request, response) => {
     ? false
     : await bcrypt.compare(password, user.passwordHash)
 
-  // const isCorrect2 = Boolean(user) && await bcrypt.compare(password, user.passwordHash)
-  // console.log(isCorrect, isCorrect2)
-
   if (!(user && isCorrect)) {
     return response.status(401).send({
       error: "Invalid username or password"
@@ -25,7 +22,7 @@ loginRouter.post("/", async (request, response) => {
     id: user._id,
   }
 
-  const token = jwt.sign(userForToken, SECRET)
+  const token = jwt.sign(userForToken, SECRET) // Might make it expire
 
   response
     .status(200)
