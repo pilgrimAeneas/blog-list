@@ -188,14 +188,34 @@ describe("POST/Create Functionality", () => {
       .expect(201)
       .expect("Content-Type", /application\/json/)
     const blogsAfter = await blogsInDB()
+    const usersAfter = await usersInDB()
 
     assert(blogsAfter.length === blogsBefore.length + 1)
     assert(blogsAfter.map(blog => blog.title).includes(testingBlog.title))
     assert(blogsAfter.map(blog => blog.author).includes(testingBlog.author))
     assert(blogsAfter.map(blog => blog.url).includes(testingBlog.url))
     assert(blogsAfter.map(blog => blog.likes).includes(testingBlog.likes))
+    assert(usersAfter[0].blogs.length === usersBefore[0].blogs.length + 1)
+  })
 
-    // TODO: Test that the user has the new blog in his list of blogs
+  test("fails to add a blog without a token", async () => {
+    const testingBlog = {
+      title: "Testing blog",
+      author: "Testing author",
+      url: "test.com",
+      likes: 5,
+    }
+
+    const blogsBefore = await blogsInDB()
+    await api
+      .post("/api/blogs")
+      .send(testingBlog)
+      .expect(401)
+      .expect("Content-Type", /application\/json/)
+    const blogsAfter = await blogsInDB()
+
+    assert(blogsAfter.length === blogsBefore.length)
+    assert(!blogsAfter.map(blog => blog.title).includes(testingBlog.title))
   })
 
   test("blog with no likes defaults to 0", async () => {
@@ -248,6 +268,12 @@ describe("POST/Create Functionality", () => {
 
 describe("PUT/Update Functionality", () => {
   test("Update a blog's likes field", async () => {
+    const usersBefore = await usersInDB()
+    const fullAuth = jwt.sign({
+      username: usersBefore[0].username,
+      id: usersBefore[0].id
+    }, SECRET)
+
     const blogsBefore = await blogsInDB()
 
     const firstBlog = blogsBefore[0]
@@ -265,6 +291,7 @@ describe("PUT/Update Functionality", () => {
 
     await api
       .put(`/api/blogs/${firstBlogID}`)
+      .set({ "Authorization": `Bearer ${fullAuth}` })
       .send(newBlog)
       .expect(200)
 
@@ -278,21 +305,28 @@ describe("PUT/Update Functionality", () => {
 
 describe("DELETE/Delete Functionality", () => {
   test("Deleting a blog works correctly", async () => {
+    const usersBefore = await usersInDB()
+    const fullAuth = jwt.sign({
+      username: usersBefore[0].username,
+      id: usersBefore[0].id
+    }, SECRET)
+
     const blogsBefore = await blogsInDB()
     const firstBlog = blogsBefore[0]
     const existingBlogID = firstBlog.id
 
     await api
       .delete(`/api/blogs/${existingBlogID}`)
+      .set({ "Authorization": `Bearer ${fullAuth}` })
       .expect(204)
 
     const blogsAfter = await blogsInDB()
+    const usersAfter = await usersInDB()
 
     assert(blogsAfter.length + 1 === blogsBefore.length)
     assert(!blogsAfter.map(blog => blog.id).includes(existingBlogID))
+    assert(usersAfter[0].blogs.length === usersBefore[0].blogs.length - 1)
   })
-
-  // TODO: Add tests for number of blogs a user has after delete.
 })
 
 describe("Unknown Endpoints", () => {
