@@ -20,7 +20,6 @@ usersRouter.get("/", async (req, res) => {
   const users = await User
     .find({})
     .populate("blogs", { url: 1, title: 1, author: 1, likes: 1 })
-  console.log(users)
   res.json(users)
 })
 
