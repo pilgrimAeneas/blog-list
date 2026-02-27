@@ -150,7 +150,7 @@ describe("POST/Create Functionality", () => {
 })
 
 describe("PUT/Update Functionality", () => {
-  test("Update a note's likes field", async () => {
+  test("Update a blog's likes field", async () => {
     const blogsBefore = await blogsInDB()
 
     const firstBlog = blogsBefore[0]
@@ -194,6 +194,8 @@ describe("DELETE/Delete Functionality", () => {
     assert(blogsAfter.length + 1 === blogsBefore.length)
     assert(!blogsAfter.map(blog => blog.id).includes(existingBlogID))
   })
+
+  // TODO: Add tests for number of blogs a user has after delete.
 })
 
 describe("Unknown Endpoints", () => {
