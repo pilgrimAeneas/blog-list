@@ -7,6 +7,7 @@ import Togglable from "./components/Togglable"
 import Notification from "./components/Notification"
 import blogService from "./services/blogs"
 import loginServices from "./services/login"
+import blogServies from "./services/blogs"
 
 const App = () => {
   const [message, setMessage] = useState(null)
@@ -65,6 +66,28 @@ const App = () => {
     }
   }
 
+  const handleLike = async blog => {
+    const newBlog = {
+      user: blog.user.id ? blog.user.id : blog.user,
+      // before update, front end blogs have user.id (full user)
+      // after update, front end blog no longer has full user, just user (id only)
+
+      likes: blog.likes + 1,
+
+      author: blog.author,
+      title: blog.title,
+      url: blog.url,
+      id: blog.id
+    }
+
+    try {
+      setBlogs(blogs.map(blog => blog.id === newBlog.id ? newBlog : blog))
+      await blogServies.update(blog.id, newBlog)
+    } catch (error) {
+      window.alert(error.response.data.error)
+    }
+  }
+
   return (
     <div>
       {user !== null ? <h2>blogs</h2> : <h2>log in to the application</h2>}
@@ -77,7 +100,12 @@ const App = () => {
             <CreateForm handleCreateBlog={handleCreateBlog} />
           </Togglable>
 
-          {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+          {blogs.map(blog =>
+            <Blog
+              key={blog.id}
+              blog={blog}
+              handleLike={() => handleLike(blog)}
+            />)}
         </>
         : <LoginForm handleLogin={handleLogin} />
       }
