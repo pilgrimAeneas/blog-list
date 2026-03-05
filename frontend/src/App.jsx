@@ -86,6 +86,11 @@ const App = () => {
     }
   }
 
+  const handleDelete = async blog => {
+    blogService.remove(blog.id)
+    setBlogs(blogs.filter(existingBlog => existingBlog.id !== blog.id))
+  }
+
   return (
     <div>
       {user !== null ? <h2>blogs</h2> : <h2>log in to the application</h2>}
@@ -105,6 +110,7 @@ const App = () => {
                 key={blog.id}
                 blog={blog}
                 handleLike={() => handleLike(blog)}
+                handleDelete={() => handleDelete(blog)}
               />)}
         </>
         : <LoginForm handleLogin={handleLogin} />

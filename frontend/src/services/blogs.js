@@ -21,8 +21,16 @@ const create = async blogObject => {
 const update = async (id, blogObject) => {
   const response = await axios.put(
     `${baseUrl}/${id}`, blogObject, { headers: { Authorization: `Bearer ${token}` } }
-  )
+  ) // Only owner can update likes?? Fix later.
   return response.data
 }
 
-export default { getAll, create, update, setToken }
+const remove = async id => {
+  const response = await axios.delete(
+    `${baseUrl}/${id}`, { headers: { Authorization: `Bearer ${token}` } }
+  )
+
+  return response.data
+}
+
+export default { getAll, create, update, remove, setToken }
