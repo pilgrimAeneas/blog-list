@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import Blog from "./components/Blog"
+import CreateForm from "./components/CreateForm"
 import blogService from "./services/blogs"
 import loginServices from "./services/login"
 
@@ -12,6 +13,8 @@ const App = () => {
   const [author, setAuthor] = useState("")
   const [url, setUrl] = useState("")
   const [message, setMessage] = useState(null)
+
+  const [formVisibility, setFormVisibility] = useState(false)
 
 
   useEffect(() => {
@@ -96,37 +99,6 @@ const App = () => {
     )
   }
 
-  const addBlogForm = () => {
-    return (
-      <>
-        <form onSubmit={handleCreateBlog}>
-          <div>
-            <label>
-              title
-              <input type="text"
-                value={title} onChange={({ target }) => setTitle(target.value)} />
-            </label>
-          </div>
-          <div>
-            <label>
-              author
-              <input type="text"
-                value={author} onChange={({ target }) => setAuthor(target.value)} />
-            </label>
-          </div>
-          <div>
-            <label>
-              url
-              <input type="text"
-                value={url} onChange={({ target }) => setUrl(target.value)} />
-            </label>
-          </div>
-          <button type="submit">create blog</button>
-        </form>
-      </>
-    )
-  }
-
   return (
     <div>
       {user !== null ? <h2>blogs</h2> : <h2>log in to the application</h2>}
@@ -134,11 +106,27 @@ const App = () => {
       {user !== null
         ? <>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-          <br />
-          <div>
-            {addBlogForm()}
-          </div>
-          <br />
+          {formVisibility
+            ? <>
+              <br />
+              <div>
+                <CreateForm
+                  handleCreateBlog={handleCreateBlog}
+                  setTitle={setTitle}
+                  setAuthor={setAuthor}
+                  setUrl={setUrl}
+                  title={title}
+                  author={author}
+                  url={url}
+                  onCancel={() => setFormVisibility(false)} />
+              </div>
+              <br />
+            </>
+            : <>
+              <div><button onClick={() => setFormVisibility(true)}>Create</button></div>
+              <br />
+            </>
+          }
           {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
         </>
         : <>
