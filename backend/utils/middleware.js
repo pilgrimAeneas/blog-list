@@ -48,28 +48,28 @@ const errorHandler = (error, req, response, next) => {
   info(error.message)
 
   if (error.name === "CastError") {
-    return response.status(400).send({ error: "Malformatted ID" })
+    return response.status(400).json({ error: "Malformatted ID" })
   }
 
   if (error.name === "ValidationError" &&
     error.message.includes("username")) {
-    return response.status(400).send({ error: "Invalid username" })
+    return response.status(400).json({ error: "Invalid username" })
   }
 
   if (error.name === "ValidationError" &&
     (error.message.includes("title") || error.message.includes("url"))
   ) {
-    return response.status(400).send({ error: "Title or URL missing" })
+    return response.status(400).json({ error: "Title or URL missing" })
   }
 
   if (error.name === "MongoServerError" &&
     error.message.includes("E11000")
   ) {
-    return response.status(400).send({ error: "username not unique" })
+    return response.status(400).json({ error: "username not unique" })
   }
 
   if (error.name === "JsonWebTokenError") {
-    return response.status(401).send({ error: "invalid token" })
+    return response.status(401).json({ error: "invalid token" })
   }
 
   if (error.name === "TokenExpiredError") {
