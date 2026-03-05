@@ -59,7 +59,9 @@ const App = () => {
     try {
       const createdBlog = await blogService.create({ title, author, url })
       notify(`a new blog ${title} by ${author} added.`)
-      setBlogs(blogs.concat(createdBlog))
+      setBlogs(blogs.concat({
+        ...createdBlog, user: { id: createdBlog.user, name: user.name, username: user.username }
+      }))
       blogFormRef.current.toggleVisibility()
     } catch (error) {
       notify(`Error creating blog: ${error.response.data.error}`)
@@ -79,7 +81,9 @@ const App = () => {
     }
 
     try {
-      setBlogs(blogs.map(blog => blog.id === newBlog.id ? { ...newBlog, user: blog.user } : blog))
+      setBlogs(
+        blogs.map(blog => blog.id === newBlog.id ? { ...newBlog, user: blog.user } : blog)
+      )
       await blogServies.update(blog.id, newBlog)
     } catch (error) {
       window.alert(error.response.data.error)
@@ -87,8 +91,10 @@ const App = () => {
   }
 
   const handleDelete = async blog => {
-    blogService.remove(blog.id)
-    setBlogs(blogs.filter(existingBlog => existingBlog.id !== blog.id))
+    if (window.confirm(`Remove ${blog.title}?`)) {
+      blogService.remove(blog.id)
+      setBlogs(blogs.filter(existingBlog => existingBlog.id !== blog.id))
+    }
   }
 
   return (
@@ -111,6 +117,7 @@ const App = () => {
                 blog={blog}
                 handleLike={() => handleLike(blog)}
                 handleDelete={() => handleDelete(blog)}
+                currentUser={user.name}
               />)}
         </>
         : <LoginForm handleLogin={handleLogin} />
