@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+
 import Blog from "./components/Blog"
 import LoginForm from "./components/LoginForm"
 import CreateForm from "./components/CreateForm"
@@ -8,9 +9,11 @@ import blogService from "./services/blogs"
 import loginServices from "./services/login"
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
   const [message, setMessage] = useState(null)
+  const [user, setUser] = useState(null)
+  const [blogs, setBlogs] = useState([])
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -27,6 +30,13 @@ const App = () => {
     }
   }, [])
 
+  const notify = message => {
+    setMessage(message)
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
+  }
+
   const handleLogin = async (username, password) => {
     try {
       const user = await loginServices.login({ username, password })
@@ -39,26 +49,20 @@ const App = () => {
     }
   }
 
-  const handleCreateBlog = async (title, author, url) => {
-    try {
-      const createdBlog = await blogService.create({ title, author, url })
-      notify(`a new blog ${title} by ${author} added.`)
-      setBlogs(blogs.concat(createdBlog))
-    } catch (error) {
-      notify(`Error creating blog: ${error.response.data.error}`)
-    }
-  }
-
   const handleLogout = () => {
     window.localStorage.clear()
     setUser(null)
   }
 
-  const notify = message => {
-    setMessage(message)
-    setTimeout(() => {
-      setMessage(null)
-    }, 5000)
+  const handleCreateBlog = async (title, author, url) => {
+    try {
+      const createdBlog = await blogService.create({ title, author, url })
+      notify(`a new blog ${title} by ${author} added.`)
+      setBlogs(blogs.concat(createdBlog))
+      blogFormRef.current.toggleVisibility()
+    } catch (error) {
+      notify(`Error creating blog: ${error.response.data.error}`)
+    }
   }
 
   return (
@@ -69,7 +73,7 @@ const App = () => {
         ? <>
           <div>{user.name} logged in <button onClick={handleLogout}>logout</button></div>
 
-          <Togglable buttonLabel="create blog">
+          <Togglable buttonLabel="create blog" ref={blogFormRef}>
             <CreateForm handleCreateBlog={handleCreateBlog} />
           </Togglable>
 
