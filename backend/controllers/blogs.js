@@ -64,10 +64,6 @@ blogsRouter.put("/:id", userExtractor, async (request, response) => {
   theBlog.likes = likes
   theBlog.user = (await User.findById(user))._id
 
-  if (theBlog.user._id.toString() !== request.user._id.toString()) {
-    return response.status(401).send({ error: "Unauthorized" })
-  }
-
   await theBlog.save()
   response.json(theBlog)
 })
