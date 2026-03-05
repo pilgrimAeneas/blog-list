@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import Blog from "./components/Blog"
 import CreateForm from "./components/CreateForm"
+import Togglable from "./components/Togglable"
 import blogService from "./services/blogs"
 import loginServices from "./services/login"
 
@@ -13,9 +14,6 @@ const App = () => {
   const [author, setAuthor] = useState("")
   const [url, setUrl] = useState("")
   const [message, setMessage] = useState(null)
-
-  const [formVisibility, setFormVisibility] = useState(false)
-
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -105,28 +103,20 @@ const App = () => {
       <Notification message={message} />
       {user !== null
         ? <>
-          <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-          {formVisibility
-            ? <>
-              <br />
-              <div>
-                <CreateForm
-                  handleCreateBlog={handleCreateBlog}
-                  setTitle={setTitle}
-                  setAuthor={setAuthor}
-                  setUrl={setUrl}
-                  title={title}
-                  author={author}
-                  url={url}
-                  onCancel={() => setFormVisibility(false)} />
-              </div>
-              <br />
-            </>
-            : <>
-              <div><button onClick={() => setFormVisibility(true)}>Create</button></div>
-              <br />
-            </>
-          }
+          <div>{user.name} logged in <button onClick={handleLogout}>logout</button></div>
+
+          <Togglable buttonLabel="create blog">
+            <CreateForm
+              handleCreateBlog={handleCreateBlog}
+              setTitle={setTitle}
+              setAuthor={setAuthor}
+              setUrl={setUrl}
+              title={title}
+              author={author}
+              url={url}
+            />
+          </Togglable>
+
           {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
         </>
         : <>

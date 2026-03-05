@@ -6,7 +6,6 @@ const addBlogForm = (
     title,
     author,
     url,
-    onCancel,
   }
 ) => {
   return (
@@ -35,7 +34,6 @@ const addBlogForm = (
         </div>
         <button type="submit">create blog</button>
       </form>
-      <button onClick={onCancel}>Cancel</button>
     </>
   )
 }
