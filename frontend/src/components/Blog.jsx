@@ -36,9 +36,10 @@ const Blog = ({ blog, handleLike }) => {
               title: {blog.title}
               {showButton()}
             </div>
+            <div>author: {blog.author}</div>
             <div>url: {blog.url}</div>
             <div>likes: {blog.likes} {likeButton()}</div>
-            <div>author: {blog.author}</div>
+            <div>user: {blog.user.name}</div>
           </>
           : <>
             {blog.title}

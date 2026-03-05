@@ -68,9 +68,7 @@ const App = () => {
 
   const handleLike = async blog => {
     const newBlog = {
-      user: blog.user.id ? blog.user.id : blog.user,
-      // before update, front end blogs have user.id (full user)
-      // after update, front end blog no longer has full user, just user (id only)
+      user: blog.user.id,
 
       likes: blog.likes + 1,
 
@@ -81,7 +79,7 @@ const App = () => {
     }
 
     try {
-      setBlogs(blogs.map(blog => blog.id === newBlog.id ? newBlog : blog))
+      setBlogs(blogs.map(blog => blog.id === newBlog.id ? { ...newBlog, user: blog.user } : blog))
       await blogServies.update(blog.id, newBlog)
     } catch (error) {
       window.alert(error.response.data.error)
