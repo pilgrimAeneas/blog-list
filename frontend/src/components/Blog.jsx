@@ -28,7 +28,7 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className="blog">
       {
         expanded
           ? <>
@@ -47,7 +47,7 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
 
           </>
           : <>
-            {blog.title}
+            {blog.title} by {blog.author}
             {showButton()}
           </>
       }
