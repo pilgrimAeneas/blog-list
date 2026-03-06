@@ -25,7 +25,7 @@ test("renders title and author without details", () => {
 })
 
 
-test("renders all details after clicking button", async () => {
+test("renders all details after clicking view", async () => {
   const blog = {
     title: "title 1",
     author: "author 1",
@@ -54,4 +54,31 @@ test("renders all details after clicking button", async () => {
   expect(author).toBeDefined()
   expect(url).toBeDefined()
   expect(likes).toBeDefined()
+})
+
+test("like button is clicked multiple times", async () => {
+  const blog = {
+    title: "title 1",
+    author: "author 1",
+    url: "url1.com",
+    likes: 0,
+    user: {
+      username: "hello",
+      name: "helloaswell",
+      id: "nonesofar",
+    }
+  }
+
+  const mockHandler = vi.fn()
+  render(<Blog blog={blog} handleLike={mockHandler} />)
+
+  const user = userEvent.setup()
+  const viewButton = screen.getByText("view")
+  await user.click(viewButton)
+
+  const likeButton = screen.getByText("like")
+  await user.click(likeButton)
+  await user.click(likeButton)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
 })
