@@ -1,0 +1,25 @@
+{
+  "name": "blog-list",
+  "version": "1.0.0",
+  "description": "A blog list application, that allows users to save information about interesting blogs they have stumbled across on the internet. For each listed blog we will save the author, title, URL, and amount of upvotes from users of the application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test --project=chromium --project=firefox",
+    "test:report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pilgrimAeneas/blog-list.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pilgrimAeneas/blog-list/issues"
+  },
+  "homepage": "https://github.com/pilgrimAeneas/blog-list#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.3.5"
+  }
+}
