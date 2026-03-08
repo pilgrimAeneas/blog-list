@@ -88,7 +88,7 @@ POST http://localhost:3003/api/users
 content-type: application/json
 
 {
-  "name": "tester2",
-  "username": "person2",
+  "name": "tester1",
+  "username": "person1",
   "password": "hash!me!now"
 }

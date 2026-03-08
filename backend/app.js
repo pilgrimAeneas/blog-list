@@ -1,4 +1,4 @@
-const { MONGODB_URL } = require("./utils/config")
+const { MONGODB_URL, NODE_ENV } = require("./utils/config")
 const express = require("express")
 const mongoose = require("mongoose")
 const { tokenExtractor } = require("./utils/middleware")
@@ -14,6 +14,7 @@ mongoose.connect(MONGODB_URL, { family: 4 })
   .catch(result => error(result.message))
 
 // app.use(express.static("dist")) // waiting for front end build
+
 app.use(express.json())
 app.use(requestLogger)
 
@@ -21,6 +22,11 @@ app.use(tokenExtractor)
 app.use("/api/blogs", blogsRouter)
 app.use("/api/users", usersRouter)
 app.use("/api/login", loginRouter)
+
+if (NODE_ENV === "test") {
+  const testingRouter = require("./controllers/testing")
+  app.use("/api/testing", testingRouter)
+}
 
 app.use(unknownEndpoint)
 app.use(errorHandler)
