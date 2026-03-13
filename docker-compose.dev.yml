@@ -1,0 +1,32 @@
+name: app-dev
+services:
+  reverse-proxy:
+    container_name: reverse-proxy-dev
+    image: nginx:1.29
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8080:80
+    depends_on:
+      - frontend
+      - server
+
+  frontend:
+    container_name: bloglist-frontend-dev
+    image: bloglist-frontend-dev
+    build:
+      context: ./frontend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./frontend:/usr/src/app/
+    environment:
+      - VITE_BACKEND_URL=http://localhost:8080/api/
+
+  server:
+    container_name: bloglist-backend-dev
+    image: bloglist-backend-dev
+    build:
+      context: ./backend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./backend:/usr/src/app/

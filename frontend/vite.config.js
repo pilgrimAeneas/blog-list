@@ -12,9 +12,11 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:3003",
+        target: "http://localhost:3000",
         changeOrigin: true
-      }
-    }
+      },
+    },
+
+    allowedHosts: ["frontend", "localhost"],
   }
 })
